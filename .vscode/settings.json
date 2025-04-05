@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "efi.h": "c",
+        "text_defs.h": "c",
+        "runtime_services.h": "c",
+        "stip.h": "c",
+        "uchar.h": "c"
+    }
+}
