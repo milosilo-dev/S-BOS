@@ -83,6 +83,32 @@ EFI_FILE_INFO get_file_info(EFI_FILE_PROTOCOL* current_directory_pointer, UINTN 
     return file_info;
 }
 
+BOOLEAN open_directory(EFI_FILE_PROTOCOL* current_directory_pointer);
+
+UINT8 open_new_directory(EFI_FILE_PROTOCOL* current_directory_pointer, UINTN selected_dir)
+{
+    EFI_FILE_PROTOCOL *new_dir;
+    current_directory_pointer->Open(current_directory_pointer, &new_dir, get_file_info(current_directory_pointer, selected_dir).FileName, EFI_FILE_MODE_READ, 0);
+    current_directory_pointer->Close(current_directory_pointer);
+    current_directory_pointer = new_dir;
+
+    EFI_GUID FileInfoGuid = EFI_FILE_INFO_ID;
+    UINTN InfoSize = 0;
+    current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, NULL);
+    EFI_FILE_INFO *FileInfo;
+    bs->AllocatePool(EfiLoaderData, InfoSize, (VOID **)&FileInfo);
+    current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, FileInfo);
+    CHAR16* filename = FileInfo->FileName;
+
+    if (open_directory(current_directory_pointer) == TRUE)
+        return 1;
+
+    current_directory_pointer->Open(current_directory_pointer, &new_dir, filename, EFI_FILE_MODE_READ, 0);
+    current_directory_pointer->Close(current_directory_pointer);
+    current_directory_pointer = new_dir;
+    return 0;
+}
+
 // 0 -> Drop to next directory
 // 1 -> Drop back to main menu
 BOOLEAN open_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
@@ -115,26 +141,15 @@ BOOLEAN open_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
                     selected_dir = num_files - 1;
                 }
                 break;
-            case 0x0D:
-                EFI_FILE_PROTOCOL *new_dir;
-                current_directory_pointer->Open(current_directory_pointer, &new_dir, get_file_info(current_directory_pointer, selected_dir).FileName, EFI_FILE_MODE_READ, 0);
-                current_directory_pointer->Close(current_directory_pointer);
-                current_directory_pointer = new_dir;
-
-                EFI_GUID FileInfoGuid = EFI_FILE_INFO_ID;
-                UINTN InfoSize = 0;
-                current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, NULL);
-                EFI_FILE_INFO *FileInfo;
-                bs->AllocatePool(EfiLoaderData, InfoSize, (VOID **)&FileInfo);
-                current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, FileInfo);
-                CHAR16* filename = FileInfo->FileName;
-
-                if (open_directory(current_directory_pointer))
-                    return 1;
-
-                current_directory_pointer->Open(current_directory_pointer, &new_dir, filename, EFI_FILE_MODE_READ, 0);
-                current_directory_pointer->Close(current_directory_pointer);
-                current_directory_pointer = new_dir;
+            case 0x0017:
+                return 1;
+                break;
+        }
+        if (l_key.UnicodeChar == 0xD){
+            if (open_new_directory(current_directory_pointer, selected_dir) == 1)
+            {
+                return 1;
+            }
         }
 
         EFI_STIP->Reset(EFI_STIP, FALSE);
@@ -164,7 +179,7 @@ UINT8 file_manager(){
 
     // new dir will be opened in a function
     open_directory(current_directory_pointer);
-
+    
     bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
     bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
     current_directory_pointer->Close(current_directory_pointer);
