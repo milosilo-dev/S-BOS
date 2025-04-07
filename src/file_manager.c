@@ -1,11 +1,6 @@
 #ifndef File_Manager_C
 #define File_Manager_C
 #include "../main.c"
-#include "setjmp.h"
-
-jmp_buf bufferA;
-UINTN jmp_val;
-BOOLEAN exit = FALSE;
 
 VOID draw_directory(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_dir)
 {
@@ -210,8 +205,7 @@ BOOLEAN open_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
                 }
                 break;
             case 0x0017:
-                exit = TRUE;
-                longjmp(bufferA, jmp_val);
+                return 0;
                 break;
         }
         if (l_key.UnicodeChar == 0xD){
@@ -251,9 +245,7 @@ UINT8 file_manager(){
     sfsp->OpenVolume(sfsp, &current_directory_pointer);
 
     // new dir will be opened in a function
-    jmp_val = setjmp(bufferA);
-    if (!exit)
-        open_directory(current_directory_pointer);
+    open_directory(current_directory_pointer);
 
     bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
     bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
