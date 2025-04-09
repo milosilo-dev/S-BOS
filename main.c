@@ -20,6 +20,7 @@ void DrawBox(UINT8 x, UINT8 y, BOOLEAN filled){
 UINT8 menu_main();
 UINT8 system_menu();
 UINT8 file_manager();
+VOID continue_boot();
 
 EFI_INPUT_KEY key;
 
@@ -43,7 +44,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
             option = menu_main(&key);
             break;
         case 1:
-            option = menu_main(&key);
+            continue_boot();
+            SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
             break;
         case 2:
             option = system_menu();
@@ -70,4 +72,5 @@ quit:
 
 #include "src/boot_menu.c"
 #include "src/file_manager.c"
+#include "src/continue_boot.c"
 #endif

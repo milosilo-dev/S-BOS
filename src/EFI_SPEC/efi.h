@@ -111,5 +111,5 @@ EFI_STATUS
 #include "file_protocol.h"
 
 #include "guids.h"
-
+#include "gop.h"
 #endif
