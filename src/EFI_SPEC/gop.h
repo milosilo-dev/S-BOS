@@ -2,6 +2,11 @@
 #define GOP_H
 #include "efi.h"
 
+#define EFI_EDID_OVERRIDE_DONT_OVERRIDE 0x01
+#define EFI_EDID_OVERRIDE_ENABLE_HOT_PLUG 0x02
+
+typedef struct _EFI_GRAPHICS_OUTPUT_PROTCOL EFI_GRAPHICS_OUTPUT_PROTOCOL;
+
 typedef struct {
     UINT32              RedMask;
     UINT32              GreenMask;
@@ -75,7 +80,7 @@ typedef EFI_STATUS(EFIAPI *EFI_GRAPHICS_OUTPUT_PROTOCOL_BLT) (
     IN UINTN                                        Delta OPTIONAL
 );
 
-typedef struct EFI_GRAPHICS_OUTPUT_PROTCOL {
+typedef struct _EFI_GRAPHICS_OUTPUT_PROTCOL {
     EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE     QueryMode;
     EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE       SetMode;
     EFI_GRAPHICS_OUTPUT_PROTOCOL_BLT            Blt;
@@ -86,4 +91,23 @@ typedef struct {
     UINT32                              SizeOfEdid;
     UINT8                               *Edid;
 } EFI_EDID_DISCOVERED_PROTOCOL;
+
+typedef struct {
+    UINT32                             SizeOfEdid;
+    UINT8                              *Edid;
+} EFI_EDID_ACTIVE_PROTOCOL;
+
+typedef struct _EFI_EDID_OVERRIDE_PROTOCOL EFI_EDID_OVERRIDE_PROTOCOL;
+
+typedef EFI_STATUS(EFIAPI *EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID) (
+    IN   EFI_EDID_OVERRIDE_PROTOCOL                   *This,
+    IN   EFI_HANDLE                                   *ChildHandle,
+    OUT  UINT32                                       *Attributes,
+    OUT UINTN                                         *EdidSize,
+    OUT UINT8                                         **Edid
+);
+
+typedef struct _EFI_EDID_OVERRIDE_PROTOCOL {
+    EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID      GetEdid;
+} EFI_EDID_OVERRIDE_PROTOCOL;
 #endif

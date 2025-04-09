@@ -21,4 +21,4 @@ mingw64-gcc
 
 This project is heavily ins[pired by a tutorial serise from [Queso Fuego](https://www.youtube.com/playlist?list=PLT7NbkyNWaqZYHNLtOZ1MNxOt8myP5K0p) on yt. I tried not to copy it directly, but parts of the project like the write_gpt are strait copys from his project.
 
-A large potion of this project was also done through the use of the UEFI docs and so that is an important source of knolage. If anybody would like to learn about UEFI OS Development i would highly recommend using both the sources mentioned here.
+A large potion of this project was also done through the use of the [UEFI docs](https://uefi.org/specs/UEFI/2.11/) and so that is an important source of knolage. If anybody would like to learn about UEFI OS Development i would highly recommend using both the sources mentioned here.

@@ -32,6 +32,7 @@ typedef int64_t INT64;
 typedef uint64_t UINT64;
 
 typedef char CHAR8;         // 8 Bit Ascii value
+typedef UINT64 EFI_PHYSICAL_ADDRESS;
 
 #ifndef _UCHAR_H
     typedef uint_least16_t char16_t; // Define char16_t manulaly is build system does not support it.
@@ -107,9 +108,9 @@ EFI_STATUS
 #include "efi_time.h"
 
 #include "stop.h"
+#include "gop.h"
 #include "stip.h"
 #include "file_protocol.h"
 
 #include "guids.h"
-#include "gop.h"
 #endif
