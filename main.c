@@ -8,6 +8,7 @@ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*    EFI_STOP;
 EFI_SIMPLE_TEXT_INPUT_PROTOCOL*     EFI_STIP;
 EFI_HANDLE                          image_handle;
 EFI_BOOT_SERVICES*                  bs;
+EFI_SYSTEM_TABLE*                   st;
 
 void DrawBox(UINT8 x, UINT8 y, BOOLEAN filled){
     EFI_STOP->SetCursorPosition(EFI_STOP, x, y);
@@ -30,6 +31,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
     EFI_STIP = SystemTable->ConIn;
     image_handle = ImageHandle;
     bs = SystemTable->BootServices;
+    st = SystemTable;
 
     EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
     EFI_STOP->Reset(EFI_STOP, FALSE);

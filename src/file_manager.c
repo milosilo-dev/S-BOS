@@ -205,7 +205,7 @@ BOOLEAN open_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
                 }
                 break;
             case 0x0017:
-                return 0;
+                efi_main(image_handle, st);
                 break;
         }
         if (l_key.UnicodeChar == 0xD){

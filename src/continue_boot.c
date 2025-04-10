@@ -5,9 +5,15 @@
 
 VOID continue_boot(){
     EFI_GUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-    EFI_GRAPHICS_OUTPUT_PROTOCOL gop;
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
 
-    bs->OpenProtocol(image_handle, &gop_guid, (VOID**)&gop, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+    bs->LocateProtocol(&gop_guid, NULL, (VOID **)&gop);
+
+    EFI_GRAPHICS_OUTPUT_MODE_INFORMATION gop_mode_info;
+    UINTN gop_mode_info_size = sizeof(gop_mode_info);
+    gop->QueryMode(gop, gop->Mode->Mode, &gop_mode_info_size, (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION**)&gop_mode_info);
+
+    st->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
     return; // Shutdown
 }
 
