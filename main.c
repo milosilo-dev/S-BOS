@@ -74,5 +74,6 @@ quit:
 
 #include "src/boot_menu.c"
 #include "src/file_manager.c"
+#include "src/gop.c"
 #include "src/continue_boot.c"
 #endif
