@@ -31,6 +31,8 @@ typedef uint32_t UINT32;
 typedef int64_t INT64;
 typedef uint64_t UINT64;
 
+#define EFI_ERROR(Status) (((INTN)(Status)) < 0)
+
 typedef char CHAR8;         // 8 Bit Ascii value
 typedef UINT64 EFI_PHYSICAL_ADDRESS;
 

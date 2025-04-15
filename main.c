@@ -21,21 +21,11 @@ void DrawBox(UINT8 x, UINT8 y, BOOLEAN filled){
 UINT8 menu_main();
 UINT8 system_menu();
 UINT8 file_manager();
-VOID continue_boot();
+EFI_STATUS continue_boot();
 
 EFI_INPUT_KEY key;
 
-
-EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
-    EFI_STOP = SystemTable->ConOut;
-    EFI_STIP = SystemTable->ConIn;
-    image_handle = ImageHandle;
-    bs = SystemTable->BootServices;
-    st = SystemTable;
-
-    EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
-    EFI_STOP->Reset(EFI_STOP, FALSE);
-
+EFI_STATUS efi_boot_menu(){
     UINT8 option = menu_main();
     while(TRUE){
         EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
@@ -47,16 +37,16 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
             break;
         case 1:
             continue_boot();
-            SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+            st->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
             break;
         case 2:
             option = system_menu();
             break;
         case 3:
-            goto quit;
+            return EFI_SUCCESS;
             break;
         case 4:
-            SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+            st->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
             break;
         case 5:
             option = menu_main(&key); // Dose nothing
@@ -68,8 +58,19 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
             break;
         }
     };
-quit:
-    return EFI_SUCCESS;
+}
+
+
+EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
+    EFI_STOP = SystemTable->ConOut;
+    EFI_STIP = SystemTable->ConIn;
+    image_handle = ImageHandle;
+    bs = SystemTable->BootServices;
+    st = SystemTable;
+
+    EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
+    EFI_STOP->Reset(EFI_STOP, FALSE);
+    return continue_boot();
 }
 
 #include "src/boot_menu.c"

@@ -87,7 +87,7 @@ typedef struct _EFI_BOOT_SERVICES{
     VOID*                   FreePages;      // EFI 1.0+
     VOID*                   GetMemoryMap;   // EFI 1.0+
     EFI_ALLOCATE_POOL       AllocatePool;   // EFI 1.0+
-    EFI_FREE_POOL*          FreePool;       // EFI 1.0+
+    EFI_FREE_POOL           FreePool;       // EFI 1.0+
 
     //
     // Event & Timer Services
