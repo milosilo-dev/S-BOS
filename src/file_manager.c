@@ -64,15 +64,15 @@ UINT8 file_manager(){
     EFI_STOP->SetCursorPosition(EFI_STOP, 14, 4);
     EFI_STOP->OutputString(EFI_STOP, u"Interact with the efi file system,");
     EFI_STOP->SetCursorPosition(EFI_STOP, 16, 5);
-    EFI_STOP->OutputString(EFI_STOP, u"Block IO Protocol or the ()");
+    EFI_STOP->OutputString(EFI_STOP, u"Get Partition Info or the ()");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
     EFI_STOP->SetCursorPosition(EFI_STOP, 25, 14);
     EFI_STOP->OutputString(EFI_STOP, u"ESP System");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
-    EFI_STOP->SetCursorPosition(EFI_STOP, 26, 16);
-    EFI_STOP->OutputString(EFI_STOP, u"Block IO");
+    EFI_STOP->SetCursorPosition(EFI_STOP, 23, 16);
+    EFI_STOP->OutputString(EFI_STOP, u"Partition Info");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
     EFI_STOP->SetCursorPosition(EFI_STOP, 29, 18);
@@ -83,10 +83,14 @@ UINT8 file_manager(){
 
         if (value == 10)
             return 10;
-        else if (value == 2)
+        else if (value == 2){
             bi_file_manager();
-        else if (value == 3)
+            return 10;
+        }
+        else if (value == 3){
             esp_file_manager();
+            return 10;
+        }
     }
 }
 

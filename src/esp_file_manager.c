@@ -144,7 +144,7 @@ EFI_STATUS open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 sel
         0);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't open the File. Error %d", status);
+        printf(EFI_STOP, u"Can't open the File. Error %d", status);
 
         return status;
     }
@@ -156,7 +156,7 @@ EFI_STATUS open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 sel
     status = file->Read(file, &buf_size, buffer);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't read the File. Error %d", status);
+        printf(EFI_STOP, u"Can't read the File. Error %d", status);
 
         return status;
     }
@@ -255,7 +255,7 @@ EFI_STATUS esp_file_manager(){
     status = bs->OpenProtocol(image_handle, &lip_guid, (VOID **)&lip, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't open the Load Image Protocol. Error %d", status);
+        printf(EFI_STOP, u"Can't open the Load Image Protocol. Error %d", status);
 
         bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
         return status;
@@ -268,7 +268,7 @@ EFI_STATUS esp_file_manager(){
     status = bs->OpenProtocol(lip->DeviceHandle, &sfsp_guid, (VOID **)&sfsp, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't open the Simple File System Protcol. Error %d", status);
+        printf(EFI_STOP, u"Can't open the Simple File System Protcol. Error %d", status);
 
         bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
         bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
@@ -280,7 +280,7 @@ EFI_STATUS esp_file_manager(){
     status = sfsp->OpenVolume(sfsp, &current_directory_pointer);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't open the root Volume. Error %d", status);
+        printf(EFI_STOP, u"Can't open the root Volume. Error %d", status);
 
         bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
         bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
@@ -292,7 +292,7 @@ EFI_STATUS esp_file_manager(){
     status = open_esp_directory(current_directory_pointer);
 
     if (EFI_ERROR(status)){
-        printf(EFI_STOP, "Can't open the root directory. Error %d", status);
+        printf(EFI_STOP, u"Can't open the root directory. Error %d", status);
 
         bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
         bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
@@ -300,7 +300,6 @@ EFI_STATUS esp_file_manager(){
         return status;
     }
 
-leave:
     bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
     bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
     current_directory_pointer->Close(current_directory_pointer);

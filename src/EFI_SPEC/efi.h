@@ -3,10 +3,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#if __has_include(<uchar.h>)
-    #include <uchar.h> // Check for unicode sopport on build system
-#endif
-
 // Empty Datum
 #define IN
 #define OUT
@@ -36,9 +32,8 @@ typedef uint64_t UINT64;
 typedef char CHAR8;         // 8 Bit Ascii value
 typedef UINT64 EFI_PHYSICAL_ADDRESS;
 
-#ifndef _UCHAR_H
-    typedef uint_least16_t char16_t; // Define char16_t manulaly is build system does not support it.
-#endif
+typedef uint_least16_t char16_t; // Define char16_t manulaly is build system does not support it.
+
 typedef char16_t CHAR16; // 16 Bit Unicode value (If build system supports it)
 
 typedef void VOID;
@@ -113,6 +108,7 @@ EFI_STATUS
 #include "gop.h"
 #include "stip.h"
 #include "file_protocol.h"
+#include "block_io.h"
 
 #include "guids.h"
 #endif

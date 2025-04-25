@@ -68,99 +68,113 @@ typedef EFI_STATUS(EFIAPI *EFI_FREE_POOL) (
    IN VOID           *Buffer
 );
 
+typedef enum {
+    AllHandles,
+    ByRegisterNotify,
+    ByProtocol
+} EFI_LOCATE_SEARCH_TYPE;
+
+typedef EFI_STATUS(EFIAPI *EFI_LOCATE_HANDLE_BUFFER) (
+   IN EFI_LOCATE_SEARCH_TYPE                    SearchType,
+   IN EFI_GUID                                  *Protocol OPTIONAL,
+   IN VOID                                      *SearchKey OPTIONAL,
+   OUT UINTN                                    *NoHandles,
+   OUT EFI_HANDLE                               **Buffer
+);
+
 #define EFI_BOOT_SERVICES_SIGNATURE 0x56524553544f4f42
 #define EFI_BOOT_SERVICES_REVISION EFI_SPECIFICATION_VERSION
 
 typedef struct _EFI_BOOT_SERVICES{
-    EFI_TABLE_HEADER        Hdr;
+    EFI_TABLE_HEADER            Hdr;
 
     //
     // Task Priority Services
     //
-    VOID*                   RaiseTPL;       // EFI 1.0+
-    VOID*                   RestoreTPL;     // EFI 1.0+
+    VOID*                       RaiseTPL;       // EFI 1.0+
+    VOID*                       RestoreTPL;     // EFI 1.0+
 
     //
     // Memory Services
     //
-    VOID*                   AllocatePages;  // EFI 1.0+
-    VOID*                   FreePages;      // EFI 1.0+
-    VOID*                   GetMemoryMap;   // EFI 1.0+
-    EFI_ALLOCATE_POOL       AllocatePool;   // EFI 1.0+
-    EFI_FREE_POOL           FreePool;       // EFI 1.0+
+    VOID*                       AllocatePages;  // EFI 1.0+
+    VOID*                       FreePages;      // EFI 1.0+
+    VOID*                       GetMemoryMap;   // EFI 1.0+
+    EFI_ALLOCATE_POOL           AllocatePool;   // EFI 1.0+
+    EFI_FREE_POOL               FreePool;       // EFI 1.0+
 
     //
     // Event & Timer Services
     //
-    VOID*                   CreateEvent;    // EFI 1.0+
-    VOID*                   SetTimer;       // EFI 1.0+
-    EFI_WAIT_FOR_EVENT      WaitForEvent;   // EFI 1.0+
-    VOID*                   SignalEvent;    // EFI 1.0+
-    VOID*                   CloseEvent;     // EFI 1.0+
-    VOID*                   CheckEvent;     // EFI 1.0+
+    VOID*                       CreateEvent;    // EFI 1.0+
+    VOID*                       SetTimer;       // EFI 1.0+
+    EFI_WAIT_FOR_EVENT          WaitForEvent;   // EFI 1.0+
+    VOID*                       SignalEvent;    // EFI 1.0+
+    VOID*                       CloseEvent;     // EFI 1.0+
+    VOID*                       CheckEvent;     // EFI 1.0+
 
     //
     // Protocol Handler Services
     //
-    VOID*                   InstallProtocolInterface;            // EFI 1.0+
-    VOID*                   ReinstallProtocolInterface;          // EFI 1.0+
-    VOID*                   UninstallProtocolInterface;          // EFI 1.0+
-    VOID*                   HandleProtocol;                      // EFI 1.0+
-    VOID*                   Reserved;    // EFI 1.0+
-    VOID*                   RegisterProtocolNotify;              // EFI  1.0+
-    VOID*                   LocateHandle;                        // EFI 1.0+
-    VOID*                   LocateDevicePath;                    // EFI 1.0+
-    VOID*                   InstallConfigurationTable;           // EFI 1.0+
+    VOID*                       InstallProtocolInterface;            // EFI 1.0+
+    VOID*                       ReinstallProtocolInterface;          // EFI 1.0+
+    VOID*                       UninstallProtocolInterface;          // EFI 1.0+
+    VOID*                       HandleProtocol;                      // EFI 1.0+
+    VOID*                       Reserved;    // EFI 1.0+
+    VOID*                       RegisterProtocolNotify;              // EFI  1.0+
+    VOID*                       LocateHandle;                        // EFI 1.0+
+    VOID*                       LocateDevicePath;                    // EFI 1.0+
+    VOID*                       InstallConfigurationTable;           // EFI 1.0+
 
     //
     // Image Services
     //
-    VOID*                   LoadImage;        // EFI 1.0+
-    VOID*                   StartImage;       // EFI 1.0+
-    VOID*                   Exit;             // EFI 1.0+
-    VOID*                   UnloadImage;      // EFI 1.0+
-    VOID*                   ExitBootServices; // EFI 1.0+
+    VOID*                       LoadImage;        // EFI 1.0+
+    VOID*                       StartImage;       // EFI 1.0+
+    VOID*                       Exit;             // EFI 1.0+
+    VOID*                       UnloadImage;      // EFI 1.0+
+    VOID*                       ExitBootServices; // EFI 1.0+
 
     //
     // Miscellaneous Services
     //
-    VOID*                   GetNextMonotonicCount; // EFI 1.0+
-    VOID*                   Stall;                 // EFI 1.0+
-    VOID*                   SetWatchdogTimer;      // EFI 1.0+
+    VOID*                       GetNextMonotonicCount; // EFI 1.0+
+    VOID*                       Stall;                 // EFI 1.0+
+    VOID*                       SetWatchdogTimer;      // EFI 1.0+
 
     //
     // DriverSupport Services
     //
-    VOID*                   ConnectController;     // EFI 1.1
-    VOID*                   DisconnectController;  // EFI 1.1+
+    VOID*                       ConnectController;     // EFI 1.1
+    VOID*                       DisconnectController;  // EFI 1.1+
 
     //
     // Open and Close Protocol Services
     //
-    EFI_OPEN_PROTOCOL       OpenProtocol;           // EFI 1.1+
-    EFI_CLOSE_PROTOCOL      CloseProtocol;          // EFI 1.1+
-    VOID*                   OpenProtocolInformation;// EFI 1.1+
+    EFI_OPEN_PROTOCOL           OpenProtocol;           // EFI 1.1+
+    EFI_CLOSE_PROTOCOL          CloseProtocol;          // EFI 1.1+
+    VOID*                       OpenProtocolInformation;// EFI 1.1+
 
     //
     // Library Services
     //
-    VOID*                   ProtocolsPerHandle;     // EFI 1.1+
-    VOID*                   LocateHandleBuffer;     // EFI 1.1+
-    EFI_LOCATE_PROTOCOL     LocateProtocol;         // EFI 1.1+
-    VOID*                   InstallMultipleProtocolInterfaces;    // EFI 1.1+
-    VOID*                   UninstallMultipleProtocolInterfaces;   // EFI 1.1+*
+    VOID*                       ProtocolsPerHandle;     // EFI 1.1+
+    EFI_LOCATE_HANDLE_BUFFER    LocateHandleBuffer;     // EFI 1.1+
+    EFI_LOCATE_PROTOCOL         LocateProtocol;         // EFI 1.1+
+    VOID*                       InstallMultipleProtocolInterfaces;    // EFI 1.1+
+    VOID*                       UninstallMultipleProtocolInterfaces;   // EFI 1.1+*
 
     //
     // 32-bit CRC Services
     //
-    VOID*                   CalculateCrc32;     // EFI 1.1+
+    VOID*                       CalculateCrc32;     // EFI 1.1+
 
     //
     // Miscellaneous Services
     //
-    VOID*                   CopyMem;        // EFI 1.1+
-    VOID*                   SetMem;         // EFI 1.1+
-    VOID*                   CreateEventEx;  // UEFI 2.0+
+    VOID*                       CopyMem;        // EFI 1.1+
+    VOID*                       SetMem;         // EFI 1.1+
+    VOID*                       CreateEventEx;  // UEFI 2.0+
 } EFI_BOOT_SERVICES;
 
 #endif

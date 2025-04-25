@@ -3,6 +3,7 @@
 
 #include "src/EFI_SPEC/efi.h"
 #include "src/print.c"
+#include "src/mem.c"
 
 EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*    EFI_STOP;
 EFI_SIMPLE_TEXT_INPUT_PROTOCOL*     EFI_STIP;

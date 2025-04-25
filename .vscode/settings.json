@@ -5,6 +5,7 @@
         "runtime_services.h": "c",
         "stip.h": "c",
         "uchar.h": "c",
-        "file_protocol.h": "c"
+        "file_protocol.h": "c",
+        "cstdlib": "c"
     }
 }
