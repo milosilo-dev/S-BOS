@@ -2,6 +2,7 @@
 #define File_Manager_C
 #include "../main.c"
 #include "esp_file_manager.c"
+#include "block_io_file_manager.c"
 
 UINT8 menu_options = 3;
 
@@ -60,15 +61,17 @@ UINT8 file_manager(){
     EFI_STOP->OutputString(EFI_STOP, u"File Manager");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_WHITE,EFI_BLACK));
-    EFI_STOP->SetCursorPosition(EFI_STOP, 5, 4);
-    EFI_STOP->OutputString(EFI_STOP, u"Interact with the efi file system, Block IO Protocol or the ()");
+    EFI_STOP->SetCursorPosition(EFI_STOP, 14, 4);
+    EFI_STOP->OutputString(EFI_STOP, u"Interact with the efi file system,");
+    EFI_STOP->SetCursorPosition(EFI_STOP, 16, 5);
+    EFI_STOP->OutputString(EFI_STOP, u"Block IO Protocol or the ()");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
     EFI_STOP->SetCursorPosition(EFI_STOP, 25, 14);
     EFI_STOP->OutputString(EFI_STOP, u"ESP System");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
-    EFI_STOP->SetCursorPosition(EFI_STOP, 29, 16);
+    EFI_STOP->SetCursorPosition(EFI_STOP, 26, 16);
     EFI_STOP->OutputString(EFI_STOP, u"Block IO");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
@@ -78,12 +81,12 @@ UINT8 file_manager(){
     while(TRUE){
         UINT8 value = file_manager_update();
 
-        if (value == 10){
+        if (value == 10)
             return 10;
-        }
-        else if (value == 3) {
+        else if (value == 2)
+            bi_file_manager();
+        else if (value == 3)
             esp_file_manager();
-        }
     }
 }
 

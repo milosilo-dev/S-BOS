@@ -132,20 +132,34 @@ EFI_FILE_INFO* get_current_esp_file_info(EFI_FILE_PROTOCOL* current_directory_po
     return FileInfo;
 }
 
-VOID open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_menu_option){
+EFI_STATUS open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_menu_option){
     EFI_FILE_INFO file_info = get_esp_child_file_info(current_directory_pointer, selected_menu_option);
     EFI_FILE_PROTOCOL* file;
-    current_directory_pointer->Open(current_directory_pointer, 
+    EFI_STATUS status;
+
+    status = current_directory_pointer->Open(current_directory_pointer, 
         &file, 
         file_info.FileName,
         EFI_FILE_MODE_READ,
         0);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't open the File. Error %d", status);
+
+        return status;
+    }
     
     VOID* buffer = NULL;
     UINT64 buf_size = file_info.FileSize;
     bs->AllocatePool(EfiLoaderData, buf_size, &buffer);
 
-    file->Read(file, &buf_size, buffer);
+    status = file->Read(file, &buf_size, buffer);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't read the File. Error %d", status);
+
+        return status;
+    }
 
     draw_esp_file(buffer, buf_size, file_info.FileName);
 
@@ -153,9 +167,10 @@ VOID open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_
     EFI_EVENT WaitList[1];
     WaitList[0] = EFI_STIP->WaitForKey;
     bs->WaitForEvent(1, WaitList, &Index);
+    return EFI_SUCCESS;
 }
 
-BOOLEAN open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer);
+EFI_STATUS open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer);
 
 UINT8 open_new_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer, UINTN selected_dir)
 {
@@ -174,14 +189,13 @@ UINT8 open_new_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer, UINTN
 
 UINT8 file_manager();
 
-// 0 -> Drop to next directory
-// 1 -> Drop back to main menu
-BOOLEAN open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
+EFI_STATUS open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
 {    
     UINT8 return_value = 2;
     UINTN Index;
     UINTN selected_dir = 0;
     UINTN num_files = get_esp_file_num(current_directory_pointer);
+    EFI_STATUS status;
 
     draw_esp_directory(current_directory_pointer, selected_dir);
 
@@ -217,7 +231,10 @@ BOOLEAN open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
                     return TRUE;
                 }
             }else{
-                open_esp_file(current_directory_pointer, selected_dir);
+                status = open_esp_file(current_directory_pointer, selected_dir);
+                if (EFI_ERROR(status)){
+                    return status;
+                }
             }
         }
 
@@ -225,33 +242,68 @@ BOOLEAN open_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer)
         draw_esp_directory(current_directory_pointer, selected_dir);
     }
 
-    return 0;
+    return EFI_SUCCESS;
 }
 
 // Entry point
-UINT8 esp_file_manager(){
+EFI_STATUS esp_file_manager(){
     // Open the Loaded Image Protocol
     EFI_GUID lip_guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
     EFI_LOADED_IMAGE_PROTOCOL *lip;
+    EFI_STATUS status;
 
-    bs->OpenProtocol(image_handle, &lip_guid, (VOID **)&lip, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+    status = bs->OpenProtocol(image_handle, &lip_guid, (VOID **)&lip, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't open the Load Image Protocol. Error %d", status);
+
+        bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
+        return status;
+    }
 
     // Open the Simple File System Protocol
     EFI_GUID sfsp_guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *sfsp;
 
-    bs->OpenProtocol(lip->DeviceHandle, &sfsp_guid, (VOID **)&sfsp, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+    status = bs->OpenProtocol(lip->DeviceHandle, &sfsp_guid, (VOID **)&sfsp, image_handle, NULL, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't open the Simple File System Protcol. Error %d", status);
+
+        bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
+        bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
+        return status;
+    }
     
     // Open root dir, loop until new dir selected
     EFI_FILE_PROTOCOL *current_directory_pointer;
-    sfsp->OpenVolume(sfsp, &current_directory_pointer);
+    status = sfsp->OpenVolume(sfsp, &current_directory_pointer);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't open the root Volume. Error %d", status);
+
+        bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
+        bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
+        current_directory_pointer->Close(current_directory_pointer);
+        return status;
+    }
 
     // new dir will be opened in a function
-    open_esp_directory(current_directory_pointer);
+    status = open_esp_directory(current_directory_pointer);
 
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, "Can't open the root directory. Error %d", status);
+
+        bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
+        bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
+        current_directory_pointer->Close(current_directory_pointer);
+        return status;
+    }
+
+leave:
     bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
     bs->CloseProtocol(image_handle, &sfsp_guid, image_handle, NULL);
     current_directory_pointer->Close(current_directory_pointer);
-    return 10;
+    return EFI_SUCCESS;
 }
 #endif
