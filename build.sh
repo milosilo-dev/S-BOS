@@ -22,7 +22,7 @@ $CC $CFLAGS -o "$TARGET" "$SOURCE"
 # Copy and write the image
 cp "$TARGET" "$DISK_IMG_FOLDER"
 cd "$DISK_IMG_FOLDER"
-./"$DISK_IMG_PGM" -v -ae / ../data/kiwi.bmp
+./"$DISK_IMG_PGM" -v -ae / ../data/kiwi.bmp -ad ../data/test.txt
 
 # Run QEMU
 cd ..

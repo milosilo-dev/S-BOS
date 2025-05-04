@@ -208,6 +208,8 @@ enum {
     ALIGNMENT = 1048576,                // 1 MiB alignment value
 };
 
+const char INFO_FILE_NAME[] = "DISK.INF";
+
 // -------------------------------------
 // Global Variables
 // -------------------------------------
@@ -886,19 +888,21 @@ bool add_disk_image_info_file(FILE *image) {
     FILE *fp = NULL;
     if (!opened_info_file) {
         opened_info_file = true;
-        fp = fopen("FILE.TXT", "wb");  // Truncate on first open
+        fp = fopen(INFO_FILE_NAME, "wb");  // Truncate on first open
     } else {
-        fp = fopen("FILE.TXT", "ab");  // Add to end of file
+        fp = fopen(INFO_FILE_NAME, "ab");  // Add to end of file
     }
     if (!fp) return false;
 
     fprintf(fp, "DISK_SIZE=%"PRIu64"\n", image_size);
     fclose(fp);
 
-    fp = fopen("FILE.TXT", "rb");
+    fp = fopen(INFO_FILE_NAME, "rb");
 
     char path[25] = { 0 };
-    strcpy(path, "/EFI/BOOT/FILE.TXT");
+    strcpy(path, "/EFI/BOOT/");
+    strcat(path, INFO_FILE_NAME);
+
     if (!add_path_to_esp(path, fp, image)) return false;
     fclose(fp);
 
@@ -957,7 +961,8 @@ bool add_file_to_data_partition(char *filepath, FILE *image) {
            filepath);
 
     // Add to info file for each file added 
-    char info_file[12] = "FILE.TXT"; // "Data (partition) files info"
+    char info_file[sizeof(INFO_FILE_NAME)];
+    strcpy(info_file, INFO_FILE_NAME);
 
     if (!opened_info_file) {
         opened_info_file = true;
@@ -1329,7 +1334,7 @@ int main(int argc, char *argv[]) {
                 "\n"
                 "options:\n"
                 "-ad --add-data-files   Add local files to the basic data partition, and create\n"
-                "                       a <FILE.TXT> file in directory '/EFI/BOOT/' in the \n"
+                "                       a <%s> file in directory '/EFI/BOOT/' in the \n"
                 "                       ESP. This INF file will hold info for each file added\n"
                 "                       ex: '-ad info.txt ../folderA/kernel.bin'.\n"
                 "-ae --add-esp-files    Add local files to the generated EFI System Partition.\n"
@@ -1352,7 +1357,7 @@ int main(int argc, char *argv[]) {
                 "                       Valid sizes: 512/1024/2048/4096\n" 
                 "-v  --vhd              Create a fixed vhd footer and add it to the end of the\n" 
                 "                       disk image. The image name will have a .vhd suffix.\n",
-                argv[0]);
+                argv[0], INFO_FILE_NAME);
         return EXIT_SUCCESS;
     }
 

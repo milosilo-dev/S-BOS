@@ -34,6 +34,9 @@ EFI_STATUS bi_file_manager(){
 
     UINT32 this_image_media_id = biop->Media->MediaId;
 
+    bs->CloseProtocol(lip->DeviceHandle, &bio_guid, image_handle, NULL);
+    bs->CloseProtocol(image_handle, &lip_guid, image_handle, NULL);
+
     // Block IO
     status = bs->LocateHandleBuffer(ByProtocol, &bio_guid, NULL, &num_handles, &handle_buffer);
     if (EFI_ERROR(status)) {
@@ -53,35 +56,36 @@ EFI_STATUS bi_file_manager(){
         }
 
         if (last_media_id != biop->Media->MediaId){
-            printf(EFI_STOP, u"[NEW DISK, %d]\n\r   ", biop->Media->MediaId);
+            printf(EFI_STOP, u"[NEW DISK, %d]  ", biop->Media->MediaId);
             if (biop->Media->MediaId == this_image_media_id)
-                printf(EFI_STOP, u"[THIS DISK]\n\r   ");
+                printf(EFI_STOP, u"[THIS DISK]");
+            printf(EFI_STOP, u"\n\r");
         }
         
-        printf(EFI_STOP, u"");
+        printf(EFI_STOP, u"[NEW BLOCK] Rmv: %t, Pr: %t, lglPrt: %t, RdOnly: %t, Wrt$: %t, BlkSz: %d, IOAln %d, "
+            u"LstBlk: %d, LwLBA: %d, LgbPerPhys: %d OptTrnLenGran: %d\r\n",
+            biop->Media->RemovableMedia,
+            biop->Media->MediaPresent,
+            biop->Media->LogicalPartition,
+            biop->Media->ReadOnly,
+            biop->Media->WriteCaching,
+            biop->Media->BlockSize,
+            biop->Media->IoAlign,
+            biop->Media->LastBlock,
+            biop->Media->LowestAlignedLba,
+            biop->Media->LogicalBlocksPerPhysicalBlock,
+            biop->Media->OptimalTransferLengthGranularity);
+        
+        printf(EFI_STOP, u"\n\r");
 
         last_media_id = biop->Media->MediaId;
         bs->CloseProtocol(handle_buffer[i], &bio_guid, image_handle, NULL);
     }
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_BLACK));
-    EFI_STOP->OutputString(EFI_STOP, u"\n\r   ");
+    EFI_STOP->OutputString(EFI_STOP, u"\n\r");
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
     EFI_STOP->OutputString(EFI_STOP, u"Press any key to go back...");
-
-    EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_RED,EFI_BLACK));
-
-    BOOLEAN filled = FALSE;
-    for (UINT8 x = 0; x < 60; x++){
-        DrawBox(x, 0, filled);
-        DrawBox(x, 20, filled);
-        filled = !filled;
-    }
-    for (UINT8 y = 0; y < 21; y++){
-        DrawBox(0, y, filled);
-        DrawBox(60, y, filled);
-        filled = !filled;
-    }
 
     UINTN Index;
     EFI_EVENT WaitList[1];

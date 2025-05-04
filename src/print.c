@@ -108,6 +108,11 @@ BOOLEAN printf(EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *EFI_STOP, CHAR16 *fmt, ...){
                     print_number(EFI_STOP, number, 2, FALSE);
                 }
                 break;
+                case u't': {
+                    BOOLEAN b = va_arg(args, int);
+                    EFI_STOP->OutputString(EFI_STOP, b ? u"Y" : u"N");
+                }
+                break;
                 default:
                     EFI_STOP->OutputString(EFI_STOP, u"%");
                     EFI_STOP->OutputString(EFI_STOP, &fmt[i]);
