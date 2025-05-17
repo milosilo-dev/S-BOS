@@ -3,6 +3,7 @@
 #include "../main.c"
 #include "esp_file_manager.c"
 #include "block_io_file_manager.c"
+#include "read_data_partition.c"
 
 UINT8 menu_options = 3;
 
@@ -63,8 +64,8 @@ UINT8 file_manager(){
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_WHITE,EFI_BLACK));
     EFI_STOP->SetCursorPosition(EFI_STOP, 14, 4);
     EFI_STOP->OutputString(EFI_STOP, u"Interact with the efi file system,");
-    EFI_STOP->SetCursorPosition(EFI_STOP, 16, 5);
-    EFI_STOP->OutputString(EFI_STOP, u"Get Partition Info or the ()");
+    EFI_STOP->SetCursorPosition(EFI_STOP, 7, 5);
+    EFI_STOP->OutputString(EFI_STOP, u"Get Partition Info or Read the Data Partition");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
     EFI_STOP->SetCursorPosition(EFI_STOP, 25, 14);
@@ -75,14 +76,18 @@ UINT8 file_manager(){
     EFI_STOP->OutputString(EFI_STOP, u"Partition Info");
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_RED));
-    EFI_STOP->SetCursorPosition(EFI_STOP, 29, 18);
-    EFI_STOP->OutputString(EFI_STOP, u"()");
+    EFI_STOP->SetCursorPosition(EFI_STOP, 20, 18);
+    EFI_STOP->OutputString(EFI_STOP, u"Read Data Partition");
 
     while(TRUE){
         UINT8 value = file_manager_update();
 
         if (value == 10)
             return 10;
+        else if (value == 1){
+            read_data_partition();
+            return 10;
+        }
         else if (value == 2){
             bi_file_manager();
             return 10;
