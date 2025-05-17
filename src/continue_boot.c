@@ -24,19 +24,19 @@ EFI_STATUS continue_boot(){
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_BLACK));
     EFI_STOP->SetCursorPosition(EFI_STOP, 20, 22);
-    printf(EFI_STOP, u"Press ( F11 ) to enter S-BOS boot menu!");
+    printf(EFI_STOP, u"Press ( ESC ) to enter S-BOS boot menu!");
     
-    UINTN index = 30000;
+    UINTN index = 60000;
     while (index != 0){
         EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
-        if (key.ScanCode == 0x15){
+        if (key.ScanCode == 0x0017){
             printf(EFI_STOP, u"HI");
             efi_boot_menu();
             continue_boot();
         }
         // | / - \ | 
         EFI_STOP->SetCursorPosition(EFI_STOP, 40, 20);
-        UINT8 frame = (UINT8)(index / 1000) % 4;
+        UINT8 frame = (UINT8)(index / 2000) % 4;
         if (frame == 0)
             printf(EFI_STOP, u"|");
         else if (frame == 1)
