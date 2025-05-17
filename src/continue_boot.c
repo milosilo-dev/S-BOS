@@ -26,17 +26,17 @@ EFI_STATUS continue_boot(){
     EFI_STOP->SetCursorPosition(EFI_STOP, 20, 22);
     printf(EFI_STOP, u"Press ( ESC ) to enter S-BOS boot menu!");
     
-    UINTN index = 30000;
+    UINTN index = 60000;
     while (index != 0){
         EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
-        if (key.UnicodeChar == 0x001B){
+        if (key.ScanCode == 0x0017){
             printf(EFI_STOP, u"HI");
             efi_boot_menu();
             continue_boot();
         }
         // | / - \ | 
         EFI_STOP->SetCursorPosition(EFI_STOP, 40, 20);
-        UINT8 frame = (UINT8)(index / 1000) % 4;
+        UINT8 frame = (UINT8)(index / 2000) % 4;
         if (frame == 0)
             printf(EFI_STOP, u"|");
         else if (frame == 1)
