@@ -4,9 +4,13 @@
 
 This is a basic operating system that I made, at the moment it is not much more than a EFI program with some boot loader fetures. As of current is has a basic file system as well as some options to shut down, boot to bios or change the text mode.
 
-I am going to implement GOP support soon but for the moment it uses the Simple Text Output Protocol to display UI as you can see in the image bellow:
+This is the Boot menu of the OS:
 
 ![1744016685531](images/ReadMe/1744016685531.png)
+
+This is the loading screen that you can see as the os is booting up, It uses GOP to render the BMP image found in the EFI partision of the disk:
+
+![1747760057392](images/ReadMe/1747760057392.png)
 
 ### Dependancys
 
