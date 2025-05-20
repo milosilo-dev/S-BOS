@@ -127,8 +127,10 @@ EFI_FILE_INFO* get_current_esp_file_info(EFI_FILE_PROTOCOL* current_directory_po
     UINTN InfoSize = 0;
     current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, NULL);
     EFI_FILE_INFO *FileInfo;
+
     bs->AllocatePool(EfiLoaderData, InfoSize, (VOID **)&FileInfo);
     current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, FileInfo);
+
     return FileInfo;
 }
 

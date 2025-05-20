@@ -82,6 +82,12 @@ typedef EFI_STATUS(EFIAPI *EFI_LOCATE_HANDLE_BUFFER) (
    OUT EFI_HANDLE                               **Buffer
 );
 
+typedef EFI_STATUS(EFIAPI *EFI_HANDLE_PROTOCOL) (
+    IN EFI_HANDLE                    Handle,
+    IN EFI_GUID                      *Protocol,
+    OUT VOID                         **Interface
+);
+
 #define EFI_BOOT_SERVICES_SIGNATURE 0x56524553544f4f42
 #define EFI_BOOT_SERVICES_REVISION EFI_SPECIFICATION_VERSION
 
@@ -119,7 +125,7 @@ typedef struct _EFI_BOOT_SERVICES{
     VOID*                       InstallProtocolInterface;            // EFI 1.0+
     VOID*                       ReinstallProtocolInterface;          // EFI 1.0+
     VOID*                       UninstallProtocolInterface;          // EFI 1.0+
-    VOID*                       HandleProtocol;                      // EFI 1.0+
+    EFI_HANDLE_PROTOCOL         HandleProtocol;                      // EFI 1.0+
     VOID*                       Reserved;    // EFI 1.0+
     VOID*                       RegisterProtocolNotify;              // EFI  1.0+
     VOID*                       LocateHandle;                        // EFI 1.0+
