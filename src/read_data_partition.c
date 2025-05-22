@@ -2,7 +2,23 @@
 #define READ_DATA_PART_C
 #include "../main.c"
 
-EFI_STATUS open_data_part_file()
+EFI_STATUS draw_data_part(VOID* buffer, UINTN buf_size){
+    char* pos = (char *)buffer;
+    for (UINTN bytes = buf_size; bytes > 0; bytes--){
+        CHAR16 str[2];
+        str[0] = *pos;
+        str[1] = u'\0';
+        if (*pos == '\n'){
+            printf(EFI_STOP, u"\r\n");
+        } else {
+            printf(EFI_STOP, u"%s", str);
+        }
+
+        pos++;
+    }
+}
+
+EFI_STATUS open_data_file_to_buffer(VOID* file_buffer)
 {
     EFI_STATUS Status;
     EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
@@ -66,7 +82,26 @@ EFI_STATUS open_data_part_file()
         return Status;
     };
 
-    return Status;
+    EFI_GUID FileInfoGuid = EFI_FILE_INFO_ID;
+    UINTN InfoSize = 0;
+    filep->GetInfo(filep, &FileInfoGuid, &InfoSize, NULL);
+    EFI_FILE_INFO *FileInfo;
+    VOID* buffer = NULL;
+
+    bs->AllocatePool(EfiLoaderData, InfoSize, (VOID **)&FileInfo);
+    filep->GetInfo(filep, &FileInfoGuid, &InfoSize, FileInfo);
+
+    UINT64 buf_size = FileInfo->FileSize;
+    bs->AllocatePool(EfiLoaderData, buf_size, &buffer);
+
+    Status = filep->Read(filep, &buf_size, buffer);
+
+    if (EFI_ERROR(Status)) {
+        printf(EFI_STOP, u"Can't read DISK INF file \n\r");
+        return Status;
+    };
+
+    return draw_data_part(buffer, FileInfo->FileSize);
 }
 
 EFI_STATUS read_data_partition(){
@@ -74,8 +109,9 @@ EFI_STATUS read_data_partition(){
     EFI_STOP->OutputString(EFI_STOP, u"Files in Data part: \n\r");
 
     EFI_STATUS status;
-    status = open_data_part_file();
+    VOID *file_buffer;
 
+    status = open_data_file_to_buffer(file_buffer);
     if (EFI_ERROR(status)){
         printf(EFI_STOP, u"Error code: %d \n\r", status);
 
