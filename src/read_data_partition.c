@@ -3,6 +3,8 @@
 #include "../main.c"
 
 EFI_STATUS draw_data_part(VOID* buffer, UINTN buf_size){
+    CHAR16* str1;
+    
     char* pos = (char *)buffer;
     for (UINTN bytes = buf_size; bytes > 0; bytes--){
         CHAR16 str[2];
@@ -10,12 +12,16 @@ EFI_STATUS draw_data_part(VOID* buffer, UINTN buf_size){
         str[1] = u'\0';
         if (*pos == '\n'){
             printf(EFI_STOP, u"\r\n");
+            str1[buf_size - bytes] = (CHAR16)"\r\n";
         } else {
             printf(EFI_STOP, u"%s", str);
+            str1[buf_size - bytes] = *str;
         }
 
         pos++;
     }
+
+    printf(EFI_STOP, u"%s", str1);
 }
 
 EFI_STATUS open_data_file_to_buffer(VOID* file_buffer)
