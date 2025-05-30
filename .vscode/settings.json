@@ -7,5 +7,5 @@
         "uchar.h": "c",
         "file_protocol.h": "c",
         "cstdlib": "c"
-    }
+    },
 }

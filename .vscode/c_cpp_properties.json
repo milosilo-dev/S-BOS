@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "x86_64-w64-mingw32-gcc",
+            "compilerArgs": [
+                "-Wl,--subsystem,10 -e efi_main"
+            ]
+        }
+    ],
+    "version": 4
+}

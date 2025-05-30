@@ -11,20 +11,19 @@ EFI_STATUS draw_data_part(VOID* buffer, UINTN buf_size){
         str[0] = *pos;
         str[1] = u'\0';
         if (*pos == '\n'){
-            printf(EFI_STOP, u"\r\n");
-            str1[buf_size - bytes] = (CHAR16)"\r\n";
+            str1[buf_size - bytes] = (CHAR16)"\n";
         } else {
-            printf(EFI_STOP, u"%s", str);
             str1[buf_size - bytes] = *str;
         }
 
         pos++;
     }
 
-    printf(EFI_STOP, u"%s", str1);
+    printf(EFI_STOP, u"%s\r\n", str1);
+    return EFI_SUCCESS;
 }
 
-EFI_STATUS open_data_file_to_buffer(VOID* file_buffer)
+EFI_STATUS open_data_file_to_buffer()
 {
     EFI_STATUS Status;
     EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
@@ -115,9 +114,8 @@ EFI_STATUS read_data_partition(){
     EFI_STOP->OutputString(EFI_STOP, u"Files in Data part: \n\r");
 
     EFI_STATUS status;
-    VOID *file_buffer;
 
-    status = open_data_file_to_buffer(file_buffer);
+    status = open_data_file_to_buffer();
     if (EFI_ERROR(status)){
         printf(EFI_STOP, u"Error code: %d \n\r", status);
 

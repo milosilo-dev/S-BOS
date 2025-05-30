@@ -894,7 +894,7 @@ bool add_disk_image_info_file(FILE *image) {
     }
     if (!fp) return false;
 
-    fprintf(fp, "DISK_SIZE=%"PRIu64"\n", image_size);
+    fprintf(fp, "DISK_SIZE=%"PRIu64";;", image_size);
     fclose(fp);
 
     fp = fopen(INFO_FILE_NAME, "rb");
@@ -977,9 +977,7 @@ bool add_file_to_data_partition(char *filepath, FILE *image) {
     }
 
     fprintf(fp,
-            "FILE_NAME=%s\n"
-            "FILE_SIZE=%"PRIu64"\n"
-            "DISK_LBA=%"PRIu64"\n\n",  // Add extra line between files
+            "FILE_NAME=%s;FILE_SIZE=%"PRIu64";DISK_LBA=%"PRIu64";",  // Add extra line between files
             name,
             file_size_bytes,
             data_lba + starting_lba);  // Offset from start of data partition
