@@ -2,29 +2,19 @@
 #define READ_DATA_PART_C
 #include "../main.c"
 
-EFI_STATUS draw_data_part(VOID* buffer, UINTN buf_size){
+CHAR16* draw_data_part(VOID* buffer, UINTN buf_size){
     CHAR16* str1;
-    
+
     char* pos = (char *)buffer;
     for (UINTN bytes = buf_size; bytes > 0; bytes--){
-        CHAR16 str[2];
-        str[0] = *pos;
-        str[1] = u'\0';
-        if (*pos == '\n'){
-            str1[buf_size - bytes] = (CHAR16)"\n";
-        } else {
-            str1[buf_size - bytes] = *str;
-        }
-
+        str1[buf_size - bytes] = *pos;
         pos++;
     }
 
-    printf(EFI_STOP, u"%s\r\n", str1);
-    return EFI_SUCCESS;
+    return str1;
 }
 
-EFI_STATUS open_data_file_to_buffer()
-{
+EFI_STATUS open_data_file_to_buffer(CHAR16** p_str, UINTN* p_buf_size){
     EFI_STATUS Status;
     EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *SimpleFS;
@@ -106,7 +96,19 @@ EFI_STATUS open_data_file_to_buffer()
         return Status;
     };
 
-    return draw_data_part(buffer, FileInfo->FileSize);
+    *p_str = draw_data_part(buffer, FileInfo->FileSize);
+    p_buf_size = &FileInfo->FileSize;
+    return EFI_SUCCESS;
+}
+
+EFI_STATUS parse_data_file(CHAR16** str, UINTN* buf_size, UINTN file_size, UINTN disk_lba){
+    printf(EFI_STOP, u"%s", *str);
+    
+    for (UINTN bytes = *buf_size; bytes > 0; bytes--){
+        
+    }
+
+    return EFI_SUCCESS;
 }
 
 EFI_STATUS read_data_partition(){
@@ -114,8 +116,24 @@ EFI_STATUS read_data_partition(){
     EFI_STOP->OutputString(EFI_STOP, u"Files in Data part: \n\r");
 
     EFI_STATUS status;
+    CHAR16* str;
+    UINTN* buf_size;
 
-    status = open_data_file_to_buffer();
+    status = open_data_file_to_buffer(&str, buf_size);
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, u"Error code: %d \n\r", status);
+
+        printf(EFI_STOP, u"Press any key to return ...\n\r");
+        UINTN Index;
+        EFI_EVENT WaitList[1];
+        WaitList[0] = EFI_STIP->WaitForKey;
+        bs->WaitForEvent(1, WaitList, &Index);
+
+        return status;
+    }
+
+    UINTN file_size = 0; UINTN disk_lba = 0;
+    status = parse_data_file(&str, buf_size, file_size, disk_lba);
     if (EFI_ERROR(status)){
         printf(EFI_STOP, u"Error code: %d \n\r", status);
 
