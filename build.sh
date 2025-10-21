@@ -1,15 +1,21 @@
 #!/bin/sh
 
+KERNEL="src/kernel/kernel.c"
+KERNEL_CC_OUT="kernel.o"
+KERNEL_TARGET="data/kernel.bin"
+KERNEL_LINKER="src/kernel/kernel.ld"
+
 SOURCE="main.c"
 TARGET="BOOTX64.EFI"
 DISK_IMG_FOLDER="write_gpt"
-DISK_IMG_PGM="./write_gpt"
+DISK_IMG_PGM="write_gpt"
 
 QEMU="./scripts/qemu.sh"
 
 find . -name '*.c' -or -name '*.h' -or -name '*.sh' | xargs wc -l | grep 'total'  | awk '{ SUM += $1; print $1} END { print "Total text lines",SUM }'
 
-CC="x86_64-w64-mingw32-gcc -Wl,--subsystem,10 -e efi_main"
+BOOT_CC="x86_64-w64-mingw32-gcc -Wl,--subsystem,10 -e efi_main -w"
+KERNEL_CC="x86_64-w64-mingw32-gcc -Wl,--subsystem,10 -e kernel_main"
 
 CFLAGS="-std=c17 -Wall -Wextra -Wpedantic -mno-red-zone -ffreestanding -nostdlib -fno-stack-protector -mno-stack-arg-probe"
 
@@ -17,18 +23,23 @@ if [ ! -f "$DISK_IMG_FOLDER/$DISK_IMG_PGM" ]; then
     (cd "$DISK_IMG_FOLDER" && make)
 fi
 
-$CC $CFLAGS -o "$TARGET" "$SOURCE"
+$KERNEL_CC $CFLAGS -o "$KERNEL_CC_OUT" "$KERNEL"
+x86_64-w64-mingw32-objcopy -O binary "$KERNEL_CC_OUT" "$KERNEL_TARGET"
+$BOOT_CC $CFLAGS -o "$TARGET" "$SOURCE"
 
 cp "$TARGET" "$DISK_IMG_FOLDER"
 cd "$DISK_IMG_FOLDER"
-./"$DISK_IMG_PGM" -v -ae / ../data/kiwi.bmp -ad ../data/test.txt
+./"$DISK_IMG_PGM" -v -ae / ../data/kiwi.bmp -ad ../data/test.txt ../"$KERNEL_TARGET"
 
 cd ..
 $QEMU
 cd "$DISK_IMG_FOLDER"
 
+# clean up
 rm -f "$TARGET"
 rm -f "FILE.TXT"
 cd ..
 
 rm -f "$TARGET"
+rm -f "$KERNEL_TARGET"
+rm -f "$KERNEL_CC_OUT"

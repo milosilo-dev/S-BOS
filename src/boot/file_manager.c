@@ -1,6 +1,6 @@
 #ifndef File_Manager_C
 #define File_Manager_C
-#include "../main.c"
+#include "../../main.c"
 #include "esp_file_manager.c"
 #include "block_io_file_manager.c"
 #include "read_data_partition.c"

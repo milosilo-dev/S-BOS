@@ -88,8 +88,62 @@ typedef EFI_STATUS(EFIAPI *EFI_HANDLE_PROTOCOL) (
     OUT VOID                         **Interface
 );
 
+//******************************************************
+//EFI_ALLOCATE_TYPE
+//******************************************************
+// These types are discussed in the "Description" section below.
+typedef enum {
+   AllocateAnyPages,
+   AllocateMaxAddress,
+   AllocateAddress,
+   MaxAllocateType
+} EFI_ALLOCATE_TYPE;
+
+typedef UINT64 EFI_PHYSICAL_ADDRESS;
+
 #define EFI_BOOT_SERVICES_SIGNATURE 0x56524553544f4f42
 #define EFI_BOOT_SERVICES_REVISION EFI_SPECIFICATION_VERSION
+
+typedef EFI_STATUS(EFIAPI *EFI_ALLOCATE_PAGES) (
+   IN EFI_ALLOCATE_TYPE                   Type,
+   IN EFI_MEMORY_TYPE                     MemoryType,
+   IN UINTN                               Pages,
+   IN OUT EFI_PHYSICAL_ADDRESS            *Memory
+);
+
+typedef EFI_STATUS(EFIAPI *EFI_FREE_PAGES) (
+    IN EFI_PHYSICAL_ADDRESS    Memory,
+    IN UINTN                   Pages
+);
+
+typedef EFI_STATUS(EFIAPI *EFI_PROTOCOLS_PER_HANDLE) (
+   IN EFI_HANDLE                             Handle,
+   OUT EFI_GUID                              ***ProtocolBuffer,
+   OUT UINTN                                 *ProtocolBufferCount
+);
+
+typedef UINT64 EFI_VIRTUAL_ADDRESS;
+
+typedef struct {
+   UINT32                     Type;
+   EFI_PHYSICAL_ADDRESS       PhysicalStart;
+   EFI_VIRTUAL_ADDRESS        VirtualStart;
+   UINT64                     NumberOfPages;
+   UINT64                     Attribute;
+} EFI_MEMORY_DESCRIPTOR;
+
+typedef EFI_STATUS(EFIAPI *EFI_GET_MEMORY_MAP) (
+   IN OUT UINTN                  *MemoryMapSize,
+   OUT EFI_MEMORY_DESCRIPTOR     *MemoryMap,
+   OUT UINTN                     *MapKey,
+   OUT UINTN                     *DescriptorSize,
+   OUT UINT32                    *DescriptorVersion
+);
+
+typedef EFI_STATUS(EFIAPI *EFI_EXIT_BOOT_SERVICES) (
+  IN EFI_HANDLE                       ImageHandle,
+  IN UINTN                            MapKey
+);
 
 typedef struct _EFI_BOOT_SERVICES{
     EFI_TABLE_HEADER            Hdr;
@@ -103,9 +157,9 @@ typedef struct _EFI_BOOT_SERVICES{
     //
     // Memory Services
     //
-    VOID*                       AllocatePages;  // EFI 1.0+
-    VOID*                       FreePages;      // EFI 1.0+
-    VOID*                       GetMemoryMap;   // EFI 1.0+
+    EFI_ALLOCATE_PAGES          AllocatePages;  // EFI 1.0+
+    EFI_FREE_PAGES              FreePages;
+    EFI_GET_MEMORY_MAP          GetMemoryMap;   // EFI 1.0+
     EFI_ALLOCATE_POOL           AllocatePool;   // EFI 1.0+
     EFI_FREE_POOL               FreePool;       // EFI 1.0+
 
@@ -139,7 +193,7 @@ typedef struct _EFI_BOOT_SERVICES{
     VOID*                       StartImage;       // EFI 1.0+
     VOID*                       Exit;             // EFI 1.0+
     VOID*                       UnloadImage;      // EFI 1.0+
-    VOID*                       ExitBootServices; // EFI 1.0+
+    EFI_EXIT_BOOT_SERVICES      ExitBootServices; // EFI 1.0+
 
     //
     // Miscellaneous Services
@@ -164,7 +218,7 @@ typedef struct _EFI_BOOT_SERVICES{
     //
     // Library Services
     //
-    VOID*                       ProtocolsPerHandle;     // EFI 1.1+
+    EFI_PROTOCOLS_PER_HANDLE    ProtocolsPerHandle;     // EFI 1.1+
     EFI_LOCATE_HANDLE_BUFFER    LocateHandleBuffer;     // EFI 1.1+
     EFI_LOCATE_PROTOCOL         LocateProtocol;         // EFI 1.1+
     VOID*                       InstallMultipleProtocolInterfaces;    // EFI 1.1+

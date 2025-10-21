@@ -28,4 +28,11 @@ typedef struct EFI_TIME_CAPABILITIES {
     BOOLEAN SetsToZero;
 } EFI_TIME_CAPABILITIES;
 
+typedef
+EFI_STATUS
+(EFIAPI *EFI_GET_TIME) (
+    OUT EFI_TIME              *Time,
+    OUT EFI_TIME_CAPABILITIES *Capabilities OPTIONAL
+);
+
 #endif

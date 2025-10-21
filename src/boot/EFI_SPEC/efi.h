@@ -14,6 +14,8 @@
 // EFIAPI defines the way of calling the EFI defined functions. It is a simple headerfile and contains no real logic, that is handeled by UEFI.
 #define EFIAPI __attribute__((ms_abi))
 
+#define PAGE_SIZE 4096
+
 // Data types: https://uefi.org/specs/UEFI/2.10_A/02_Overview.html#data-types
 typedef uint8_t BOOLEAN;
 typedef int64_t INTN;       // Largest Int avalibe on target system, 64 bit = int64
@@ -58,57 +60,23 @@ typedef UINTN EFI_TPL;
 #define TOP_BIT 0x8000000000000000ULL
 #define ENCODE_ERROR(x) (x | TOP_BIT)
 
-// EFI_TABLE_HEADER
-// https://uefi.org/specs/UEFI/2.10_A/04_EFI_System_Table.html#id4
-typedef struct{
-    UINT64 Signature;
-    UINT32 Revision;
-    UINT32 HeaderSize;
-    UINT32 CRC32;
-    UINT32 Reserved;
-} EFI_TABLE_HEADER;
-
-// EFI_SYSTEM_TABLE
-// https://uefi.org/specs/UEFI/2.10_A/04_EFI_System_Table.html#id6
-typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
-typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
-typedef struct s_efi_runtime_service_handle EFI_RUNTIME_SERVICES;
-typedef struct _EFI_BOOT_SERVICES EFI_BOOT_SERVICES;
-
-typedef struct {
-    EFI_TABLE_HEADER                Hdr;
-    CHAR16                          *FirmwareVendor;
-    UINT32                          FirmwareRevision;
-    EFI_HANDLE                      ConsoleInHandle;
-    EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *ConIn;
-    EFI_HANDLE                      ConsoleOutHandle;
-    EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *ConOut;
-    EFI_HANDLE                      StandardErrorHandle;
-    VOID                            *StdErr;
-    EFI_RUNTIME_SERVICES            *RuntimeServices;
-    EFI_BOOT_SERVICES               *BootServices;
-    UINTN                           NumberOfTableEntries;
-    VOID                            *ConfigurationTable;
-} EFI_SYSTEM_TABLE;
-
-// EFI_IMAGE_ENTRY_POINT
-// https://uefi.org/specs/UEFI/2.10_A/07_Services_Boot_Services.html#efi-image-entry-point
-typedef
-EFI_STATUS
-(EFIAPI *EFI_IMAGE_ENTRY_POINT)(
-    IN EFI_HANDLE ImageHandle,
-    IN EFI_SYSTEM_TABLE *SystemTable
-);
-
+#include "system_table.h"
+#include "efi_time.h"
 #include "runtime_services.h"
 #include "boot_services.h"
-#include "efi_time.h"
 
 #include "stop.h"
 #include "gop.h"
+
+typedef struct {
+    UINT32 width;
+    UINT32 height;
+} RESOLUTION;
 #include "stip.h"
 #include "file_protocol.h"
+#include "disk_io.h"
 #include "block_io.h"
 
 #include "guids.h"
+#include "kernel_params.h"
 #endif

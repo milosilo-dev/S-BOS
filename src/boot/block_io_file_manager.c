@@ -1,6 +1,6 @@
 #ifndef BI_File_Manager_C
 #define BI_File_Manager_C
-#include "../main.c" 
+#include "../../main.c" 
 
 EFI_STATUS bi_file_manager(){
     EFI_STATUS status;

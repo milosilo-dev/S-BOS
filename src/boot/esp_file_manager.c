@@ -1,6 +1,6 @@
 #ifndef ESP_File_Manager_C
 #define ESP_File_Manager_C
-#include "../main.c"
+#include "../../main.c"
 
 VOID draw_esp_directory(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_dir)
 {
@@ -122,6 +122,26 @@ EFI_FILE_INFO get_esp_child_file_info(EFI_FILE_PROTOCOL* current_directory_point
     return file_info;
 }
 
+EFI_FILE_INFO get_esp_file_info_from_name(EFI_FILE_PROTOCOL* current_directory_pointer, CHAR16 filename){
+    EFI_FILE_INFO file_info;
+    UINTN buf_size = sizeof file_info;
+    UINT8 index = 0;
+
+    current_directory_pointer->SetPosition(current_directory_pointer, 0);
+    current_directory_pointer->Read(current_directory_pointer, &buf_size, &file_info);
+
+    while (buf_size > 0){
+        if (file_info.FileName == filename){
+            break;
+        }
+
+        buf_size = sizeof file_info;
+        current_directory_pointer->Read(current_directory_pointer, &buf_size, &file_info);
+        index++;
+    }
+    return file_info;
+}
+
 EFI_FILE_INFO* get_current_esp_file_info(EFI_FILE_PROTOCOL* current_directory_pointer){
     EFI_GUID FileInfoGuid = EFI_FILE_INFO_ID;
     UINTN InfoSize = 0;
@@ -132,6 +152,50 @@ EFI_FILE_INFO* get_current_esp_file_info(EFI_FILE_PROTOCOL* current_directory_po
     current_directory_pointer->GetInfo(current_directory_pointer, &FileInfoGuid, &InfoSize, FileInfo);
 
     return FileInfo;
+}
+
+EFI_STATUS open_esp_file_from_name(EFI_FILE_PROTOCOL* current_directory_pointer, CHAR16 filename){
+    EFI_FILE_INFO file_info = get_esp_file_info_from_name(current_directory_pointer, filename);
+    EFI_FILE_PROTOCOL* file;
+    EFI_STATUS status;
+
+    status = current_directory_pointer->Open(current_directory_pointer,
+        &file,
+        file_info.FileName,
+        EFI_FILE_MODE_READ,
+        0);
+
+        if (EFI_ERROR(status)){
+        printf(EFI_STOP, u"Can't open the File. Error %d", status);
+
+        return status;
+    }
+    
+    VOID* buffer = NULL;
+    UINT64 buf_size = file_info.FileSize;
+    bs->AllocatePool(EfiLoaderData, buf_size, &buffer);
+
+    status = file->Read(file, &buf_size, buffer);
+
+    if (EFI_ERROR(status)){
+        printf(EFI_STOP, u"Can't read the File. Error %d", status);
+
+        return status;
+    }
+
+    char* pos = (char *)buffer;
+    CHAR16* file_string = u"";
+    for (UINTN bytes = buf_size; bytes > 0; bytes--){
+        file_string = file_string + *pos;
+        pos++;
+    }
+
+    UINTN Index;
+    EFI_EVENT WaitList[1];
+    WaitList[0] = EFI_STIP->WaitForKey;
+    bs->WaitForEvent(1, WaitList, &Index);
+
+    return status;
 }
 
 EFI_STATUS open_esp_file(EFI_FILE_PROTOCOL* current_directory_pointer, UINT8 selected_menu_option){

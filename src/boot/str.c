@@ -1,23 +1,11 @@
-#ifndef MEM_C
-#define MEM_C
+#ifndef STR_H
+#define STR_H
 #include "EFI_SPEC/efi.h"
 
-VOID *memset(VOID *dst, UINT8 c, UINTN len){
-    UINT8 *p = dst;
-    for (UINTN i = 0; i < len; i++)
-        p[i] = c;
-    
-    return dst;
-}
-
-VOID *memcpy(VOID *dst, VOID *src, UINTN len) {
-    UINT8 *p = dst;
-    UINT8 *q = src;
-
-    for (UINTN i = 0; i < len; i++)
-        p[i] = q[i];
-    
-    return dst;
+UINTN strlen(CHAR16 *s) {
+    UINTN len = 0;
+    while (*s++) len++;
+    return len;
 }
 
 UINTN SplitString(CHAR16* TokenBuffer, CHAR16* Input, CHAR16 Delimiter, CHAR16** OutputTokens) {
@@ -50,4 +38,29 @@ UINTN SplitString(CHAR16* TokenBuffer, CHAR16* Input, CHAR16 Delimiter, CHAR16**
     return tokenIndex; // Return number of tokens
 }
 
+CHAR16* stpstr(CHAR16* haystack, CHAR16* needle){
+    if (!needle) return haystack;
+
+    CHAR16* p = haystack;
+    while (*p) {
+        if (*p == *needle && !memcmp(p, needle, strlen(needle))) 
+            return p + strlen(needle);
+        p++;
+    }
+
+    return NULL;
+}
+
+BOOLEAN isdigit(char c) {
+    return c >= '0' && c <= '9';
+}
+
+INTN atoi(CHAR16 *s) {
+    INTN result = 0;
+    while (*s >= L'0' && *s <= L'9') {
+        result = (result * 10) + (*s - L'0');
+        s++;
+    }
+    return result;
+}
 #endif

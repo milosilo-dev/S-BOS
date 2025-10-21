@@ -1,6 +1,6 @@
 #ifndef GOP_C
 #define GOP_C
-#include "../main.c"
+#include "../../main.c"
 
 #pragma pack(push, 1)
 typedef struct {

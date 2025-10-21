@@ -18,8 +18,8 @@ uint64_t (EFIAPI *EFI_RESET_SYSTEM)
 );
 
 typedef struct s_efi_runtime_service_handle {
-    EFI_TABLE_HEADER Hdr;
-    void*                           GetTime; 
+    EFI_TABLE_HEADER                Hdr;
+    EFI_GET_TIME                    GetTime; 
     void*                           SetTime; 
     void*                           GetWakeupTime; 
     void*                           SetWakeupTime; 

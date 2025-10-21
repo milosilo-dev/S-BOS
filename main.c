@@ -1,9 +1,10 @@
 #ifndef MAIN_C
 #define MAIN_C
 
-#include "src/EFI_SPEC/efi.h"
-#include "src/print.c"
-#include "src/mem.c"
+#include "src/boot/EFI_SPEC/efi.h"
+#include "src/boot/print.c"
+#include "src/boot/mem.c"
+#include "src/boot/str.c"
 
 EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*    EFI_STOP;
 EFI_SIMPLE_TEXT_INPUT_PROTOCOL*     EFI_STIP;
@@ -74,8 +75,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable){
     return continue_boot();
 }
 
-#include "src/boot_menu.c"
-#include "src/file_manager.c"
-#include "src/gop.c"
-#include "src/continue_boot.c"
+#include "src/boot/boot_menu.c"
+#include "src/boot/file_manager.c"
+#include "src/boot/gop.c"
+#include "src/boot/continue_boot.c"
 #endif

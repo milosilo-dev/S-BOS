@@ -1,6 +1,6 @@
 #ifndef BOOTMENU_H
 #define BOOTMENU_H
-#include "../main.c"
+#include "../../main.c"
 
 UINT8 selected_menu_option = 0;
 const UINT8 main_menu_options = 6;

@@ -1,6 +1,7 @@
 #ifndef CONTINUE_BOOT_C
 #define CONTINUE_BOOT_C
-#include "../main.c"
+#include "../../main.c"
+#include "load_kernel.c"
 
 GOP_OBJ gop_obj;
 
@@ -24,13 +25,16 @@ EFI_STATUS continue_boot(){
 
     EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_BLACK));
     EFI_STOP->SetCursorPosition(EFI_STOP, 20, 22);
-    printf(EFI_STOP, u"Press ( ESC ) to enter S-BOS boot menu!");
+    printf(EFI_STOP, u"Press ( ESC ) to enter S-BOS boot menu!\n\r");
     
+    EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_RED,EFI_BLACK));
+    load_kernel(&gop_obj);
+    EFI_STOP->SetAttribute(EFI_STOP, EFI_TEXT_ATTR(EFI_YELLOW,EFI_BLACK));
+
     UINTN index = 60000;
     while (index != 0){
         EFI_STIP->ReadKeyStroke(EFI_STIP, &key);
         if (key.ScanCode == 0x0017){
-            printf(EFI_STOP, u"HI");
             efi_boot_menu();
             continue_boot();
         }
